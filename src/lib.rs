@@ -1,5 +1,4 @@
 use std::vec::Vec;
-use serde::Serialize;
 use serde_json::json;
 
 mod api;
@@ -7,30 +6,7 @@ pub mod color;
 
 use color::NanoLeafColor;
 use api::NanoLeafAPI;
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct WriteEffectRequest<'a> {
-    command: &'a str,
-    version: &'a str,
-    anim_type: &'a str,
-    anim_name: &'a str,
-    color_type: &'a str,
-    plugin_uuid: &'a str,
-    plugin_type: &'a str,
-    plugin_options: Vec<PluginOption::<'a>>,
-    palette: Vec<NanoLeafColor>,
-    has_overlay: bool
-}
-
-#[derive(Serialize)]
-#[serde(tag = "name", content = "value", rename_all = "camelCase")]
-pub enum PluginOption<'a> {
-    TransTime(u32),
-    DelayTime(u32),
-    LinDirection(&'a str),
-    Loop(bool)
-}
+use api::effects::{PluginOption, EffectDetails};
 
 pub struct NanoLeafClient {
     access_token: String,
@@ -130,24 +106,20 @@ impl NanoLeafClient {
             PluginOption::Loop(true)
         ];
                 
-        let effect_request = WriteEffectRequest {
-            command: "add",
-            version: "2.0",
-            anim_type: "plugin",
-            anim_name: &name,
-            color_type: "HSB",
-            has_overlay: false,
-            plugin_uuid: "027842e4-e1d6-4a4c-a731-be74a1ebd4cf",
-            plugin_type: "color",
-            plugin_options,
-            palette
-        };
-
         let body = json!({
-            "write": effect_request
+            "write": EffectDetails {
+                command: "add",
+                version: "2.0",
+                anim_type: "plugin",
+                anim_name: &name,
+                color_type: "HSB",
+                has_overlay: false,
+                plugin_uuid: "027842e4-e1d6-4a4c-a731-be74a1ebd4cf",
+                plugin_type: "color",
+                plugin_options,
+                palette
+            }
         });
-
-        println!("testy testy: {}", &body);
 
         let client = reqwest::Client::new();
         let resp = client.put(&endpoint)

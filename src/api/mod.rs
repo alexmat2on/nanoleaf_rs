@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 pub mod state;
-mod effects;
+pub mod effects;
 mod panel_layout;
 mod rhythm;
 
