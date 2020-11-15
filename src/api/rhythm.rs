@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::api::PanelPos;
+use crate::api::Position;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -11,5 +11,5 @@ pub struct Rhythm {
     pub firmware_version: Option<String>,
     pub aux_available: Option<bool>,
     pub rhythm_mode: Option<u32>,
-    pub rhythm_pos: Option<PanelPos>
+    pub rhythm_pos: Option<Position>
 }

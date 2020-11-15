@@ -48,7 +48,7 @@ impl NanoLeafClient {
         Ok(resp.text().await?)
     }
 
-    pub async fn select(&self, name: Option<String>) -> Result<Option<String>, Box<dyn std::error::Error>> {
+    pub async fn select(&self, name: Option<&str>) -> Result<Option<String>, Box<dyn std::error::Error>> {
         match name {
             None => {
                 let endpoint = self.api("effects/select");
@@ -74,7 +74,7 @@ impl NanoLeafClient {
         }
     }
 
-    pub async fn request_effect(&self, name: String) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn request_effect(&self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
         let endpoint = self.api("effects");
         let body = json!({
             "write": {
@@ -94,7 +94,7 @@ impl NanoLeafClient {
 
     pub async fn add_wheel_effect(
         &self,
-        name: String,
+        name: &str,
         palette: Vec<NanoLeafColor>
     ) -> Result<String, Box<dyn std::error::Error>> {
         let endpoint = self.api("effects");
@@ -286,6 +286,25 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn put_select_test() {
+	let mock_server = MockServer::start().await;
+	let response = ResponseTemplate::new(200);
+
+	Mock::given(method("PUT"))
+	    .and(path("/api/v1/TOKEN/effects"))
+	    .and(body_json(json!({"select": "My Animation"})))
+	    .respond_with(response)
+	    .expect(1)
+	    .mount(&mock_server)
+	    .await;
+
+	let client = NanoLeafClient::new("TOKEN", &mock_server.uri());
+	let result = client.select(Some("My Animation")).await.expect("Something went wrong").unwrap();
+
+	assert_eq!(result, "")
+    }
+    
+    #[tokio::test]
     async fn put_wheel_effect() {
         let mock_server = MockServer::start().await;
         let response = ResponseTemplate::new(200);
@@ -346,7 +365,7 @@ mod tests {
 
         let client = NanoLeafClient::new("TOKEN", &mock_server.uri());
         let _ = client.add_wheel_effect(
-            "My Animation".to_string(),
+            "My Animation",
             vec![NanoLeafColor::new(0, 100, 100), NanoLeafColor::new(120, 100, 100), NanoLeafColor::new(240, 100, 100)]
         ).await.expect("Something went wrong");
     }

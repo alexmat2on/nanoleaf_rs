@@ -13,7 +13,7 @@ pub struct BoundedValue {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct PanelPos {
+pub struct Position {
     pub x: i32,
     pub y: i32,
     pub o: i32,

@@ -1,15 +1,15 @@
 use std::vec::Vec;
 use serde::Deserialize;
-use crate::api::{BoundedValue, PanelPos};
+use crate::api::{BoundedValue, Position};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct Position {
+pub struct PanelPosition {
     pub panel_id: u32,
     pub shape_type: u32,
     
     #[serde(flatten)]
-    pub pos: PanelPos,
+    pub pos: Position,
 }
 
 #[derive(Deserialize, Debug)]
@@ -17,7 +17,7 @@ pub struct Position {
 pub struct Layout {
     pub num_panels: u32,
     pub side_length: u32,
-    pub position_data: Vec<Position>
+    pub position_data: Vec<PanelPosition>
 }
 
 #[derive(Deserialize, Debug)]
